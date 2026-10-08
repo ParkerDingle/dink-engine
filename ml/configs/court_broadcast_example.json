@@ -1,0 +1,10 @@
+{
+  "pixels": {
+    "near_left": [268, 668],
+    "near_right": [1012, 668],
+    "far_left": [462, 248],
+    "far_right": [818, 248],
+    "near_kitchen_left": [366, 452],
+    "near_kitchen_right": [914, 452]
+  }
+}

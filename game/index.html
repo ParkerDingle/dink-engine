@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dink Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+</head>
+<body>
+<div id="game">
+  <canvas id="c" tabindex="0" aria-label="3D pickleball court"></canvas>
+
+  <div class="hud" id="bug">
+    <div class="tm"><i style="background:var(--team-a)"></i><span class="nm" id="nmA">Your team</span><span class="sv" id="svA"></span><span class="pt" id="ptA">0</span></div>
+    <div class="tm"><i style="background:var(--team-b)"></i><span class="nm" id="nmB">Opponents</span><span class="sv" id="svB"></span><span class="pt" id="ptB">0</span></div>
+    <div class="bugMeta" id="bugMeta">Rally scoring · to 11</div>
+  </div>
+
+  <div class="hud" id="tools">
+    <button class="tool" id="tEval" aria-pressed="true"><span class="dot"></span>Eval map <kbd>E</kbd></button>
+    <button class="tool" id="tAssist" aria-pressed="true"><span class="dot"></span>Footwork assist <kbd>F</kbd></button>
+    <button class="tool" id="tSound" aria-pressed="true"><span class="dot"></span>Sound <kbd>M</kbd></button>
+    <button class="tool" id="tPause" aria-pressed="true">Pause <kbd>P</kbd></button>
+  </div>
+
+  <div class="hud" id="drillCard" hidden><div class="e" id="dcE"></div><b id="dcT"></b><p id="dcP"></p></div>
+  <div class="hud" id="banner"><span class="big" id="bnBig"></span><span class="sub" id="bnSub"></span></div>
+  <div class="hud" id="kitchen" hidden>In the kitchen · no volleys</div>
+
+  <div class="hud" id="decide" hidden>
+    <div class="dHead"><span class="t">Your call</span><span class="chips" id="dChips"></span></div>
+    <div class="timer"><i id="dTimer"></i></div>
+    <div class="dShots" id="dShots"></div>
+    <div class="dHint" id="dHint"></div>
+  </div>
+
+  <div class="hud" id="toast"><div class="glyph" id="tsG"></div><div><b id="tsT"></b><span id="tsS"></span></div></div>
+  <div class="hud" id="keys"><span><kbd>WASD</kbd> move</span><span><kbd>1</kbd>–<kbd>6</kbd> shot</span><span>mouse aim</span><span><kbd>click</kbd> hit</span><span><kbd>L</kbd> leave it</span></div>
+
+  <div id="overlay"></div>
+  <div id="loading"><div class="inner"><span class="eyebrow">Loading court, players and model</span><div class="title" style="font-size:44px">Dink <em>Engine</em></div><div class="bar"><i id="loadBar"></i></div><span class="note" id="loadMsg">Starting…</span></div></div>
+  <div class="hud" id="nogl" hidden><p>This game needs WebGL, which isn't available in this browser.</p></div>
+</div>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

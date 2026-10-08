@@ -1,0 +1,79 @@
+{
+  "file": "shot_value.onnx",
+  "feature_version": "dink-features-v1",
+  "features": [
+    "hit_x",
+    "hit_d",
+    "hit_h",
+    "in_speed",
+    "shot_no",
+    "partner_x",
+    "partner_d",
+    "oppA_x",
+    "oppA_d",
+    "oppB_x",
+    "oppB_d",
+    "opp_up",
+    "my_up",
+    "t_dink",
+    "t_drop",
+    "t_drive",
+    "t_speedup",
+    "t_lob",
+    "t_putaway",
+    "tgt_x",
+    "tgt_d"
+  ],
+  "trained_on": "selfplay.csv",
+  "source": "self-play: 30,000 simulated pro rallies",
+  "rows": 213300,
+  "rallies": 29896,
+  "trees": 69,
+  "auc": 0.5766,
+  "log_loss": 0.6822,
+  "baseline_log_loss": 0.6926,
+  "onnx_max_abs_diff": 7.529413692530795e-08,
+  "calibration": [
+    {
+      "bin": "0.2-0.3",
+      "n": 75,
+      "predicted": 0.29,
+      "actual": 0.293
+    },
+    {
+      "bin": "0.3-0.4",
+      "n": 4864,
+      "predicted": 0.371,
+      "actual": 0.361
+    },
+    {
+      "bin": "0.4-0.5",
+      "n": 12109,
+      "predicted": 0.465,
+      "actual": 0.468
+    },
+    {
+      "bin": "0.5-0.6",
+      "n": 13841,
+      "predicted": 0.525,
+      "actual": 0.525
+    },
+    {
+      "bin": "0.6-0.7",
+      "n": 1109,
+      "predicted": 0.63,
+      "actual": 0.667
+    }
+  ],
+  "top_features": [
+    "t_lob",
+    "hit_h",
+    "tgt_d",
+    "t_dink",
+    "in_speed",
+    "t_putaway",
+    "oppA_d",
+    "opp_up"
+  ],
+  "created": "2026-10-08T19:13:15+00:00"
+}

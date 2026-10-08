@@ -1,0 +1,33 @@
+[project]
+name = "dink-ml"
+version = "0.3.0"
+description = "Pro pickleball computer-vision pipeline and shot-value model for Dink Engine"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.26",
+  "pandas>=2.1",
+  "scikit-learn>=1.4",
+  "lightgbm>=4.3",
+  "onnx>=1.16",
+  "onnxmltools>=1.12",
+  "onnxruntime>=1.18",
+  "opencv-python-headless>=4.9",
+]
+
+[project.optional-dependencies]
+# Video tracking. Pulls in PyTorch, so it's kept separate from the training install.
+cv = ["ultralytics>=8.3", "supervision>=0.25"]
+dev = ["pytest>=8"]
+
+[project.scripts]
+dink-ml = "dink_ml.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["dink_ml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

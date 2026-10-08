@@ -1,0 +1,55 @@
+name: Retrain model
+
+# Regenerates self-play data, retrains the shot-value model and opens a pull request with the new
+# ONNX file and model card. Add real shot tables under ml/data/real/ (via Git LFS or a release
+# download step) and they are mixed in automatically.
+
+on:
+  workflow_dispatch:
+    inputs:
+      rallies:
+        description: Self-play rallies to simulate
+        default: "30000"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: game/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: ml/pyproject.toml
+      - name: Simulate rallies
+        working-directory: game
+        run: |
+          npm ci
+          npm run selfplay -- ${{ inputs.rallies }} ../ml/data/selfplay.csv 7
+      - name: Train and export
+        working-directory: ml
+        run: |
+          pip install -e .
+          shopt -s nullglob
+          python -m dink_ml.train data/selfplay.csv data/real/*.csv --out ../game/public/models --source "self-play ${{ inputs.rallies }} rallies + real shots"
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          c = json.load(open("../game/public/models/model_card.json"))
+          print(f"### Shot-value model\n\n| rows | AUC | log loss | baseline |\n|---|---|---|---|\n| {c['rows']:,} | {c['auc']} | {c['log_loss']} | {c['baseline_log_loss']} |")
+          PY
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: model/retrain-${{ github.run_number }}
+          title: "Retrained shot-value model (run ${{ github.run_number }})"
+          body: "Automated retrain. See the job summary for metrics; the model card is in game/public/models/model_card.json."
+          add-paths: game/public/models/*
+          commit-message: "Retrain shot-value model"

@@ -1,0 +1,16 @@
+# game
+game/node_modules/
+game/dist/
+# ml
+ml/data/*.csv
+ml/data/*.meta.json
+ml/data/real/
+ml/**/__pycache__/
+ml/*.egg-info/
+ml/.pytest_cache/
+.venv/
+*.pt
+*.mp4
+*.mov
+# misc
+.DS_Store
