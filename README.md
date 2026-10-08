@@ -6,6 +6,9 @@ shot-value model scores every option, grades your choice, colors the court by wi
 AI opponents. The model is trained by the pipeline in `ml/`, first on simulated rallies and then on
 tracked pro footage.
 
+There are two versions of the game: a browser game (`game/`, Three.js) and a Roblox game (`roblox/`)
+with online 2v2 doubles where AI fills the empty spots. Both use the same simulation and model.
+
 ```mermaid
 flowchart LR
   V[Pro match video] --> T[ml: track players + ball<br/>YOLO · ByteTrack · homography]
@@ -14,6 +17,7 @@ flowchart LR
   SP[game: self-play rallies] --> S
   S --> M[ml: train LightGBM<br/>export ONNX]
   M --> G[game: onnxruntime-web<br/>grades · eval map · AI choices]
+  M --> RB[roblox: model as Luau<br/>server-side grades · AI]
 ```
 
 ## Repository layout
@@ -24,7 +28,8 @@ flowchart LR
 | `game/src/sim/` | Rules, ball flight, AI and shot calls. No rendering, so it runs in tests and headless self-play |
 | `game/src/engine/` | Rule engine (fallback scorer + execution odds), feature contract, model connector, drills |
 | `game/public/models/` | The trained model the game loads (`shot_value.onnx` + `model_card.json`) |
-| `ml/` | Python pipeline: court calibration, tracking, event detection, shot table, training, ONNX export, pytest tests |
+| `ml/` | Python pipeline: court calibration, tracking, event detection, shot table, training, ONNX and Luau export, pytest tests |
+| `roblox/` | The Roblox game: Rojo project, Luau port of the simulation, server, client, headless tests ([details](roblox/README.md)) |
 | `docs/` | Architecture and the model input contract |
 | `.github/workflows/` | CI, GitHub Pages deploy, one-click model retraining |
 
@@ -38,6 +43,13 @@ npm run dev        # http://localhost:5173
 
 Controls: WASD or arrows to move, 1–6 to pick a shot, mouse to aim, click or Space to hit, L to leave an
 out ball, R to replay after a point, E eval map, F footwork assist, P pause.
+
+## Play on Roblox
+
+Download `dink-engine.rbxl` from the latest CI run (Actions → CI → **dink-engine-roblox**), open it in
+Roblox Studio with File → Open from File, and press Play. Test → Clients and Servers runs a
+multiplayer test with up to four players. [roblox/README.md](roblox/README.md) covers controls,
+building with Rojo, the tests and publishing from GitHub.
 
 ## Train the model
 
@@ -79,11 +91,16 @@ change once it's trained on real shots.
 
 ## GitHub
 
-- **CI** (`ci.yml`): type check, unit tests and production build for the game; pytest for the pipeline.
+- **CI** (`ci.yml`): type check, unit tests and production build for the game; pytest for the pipeline;
+  Luau tests, place build and a headless play-through for the Roblox game (the `.rbxl` is uploaded as
+  an artifact).
 - **Deploy** (`pages.yml`): builds the game and publishes it to GitHub Pages on every push to `main`.
   Pages on a private repository needs a paid GitHub plan.
 - **Retrain** (`retrain.yml`): run it from the Actions tab. It simulates rallies, retrains (mixing in any
-  real shot tables in `ml/data/real/`) and opens a pull request with the new model and its metrics.
+  real shot tables in `ml/data/real/`) and opens a pull request with the new model (ONNX and Luau)
+  and its metrics.
+- **Publish to Roblox** (`roblox-publish.yml`): builds the place and uploads it to your experience
+  through Roblox Open Cloud. Setup steps are at the top of the workflow file.
 
 ## Dependencies
 
@@ -103,6 +120,9 @@ and PyPI download APIs where they were reachable.
 | scikit-learn, pandas, numpy | Metrics and data handling | 184M+ each |
 | opencv-python-headless | Court homography | 37.1M |
 | ultralytics, supervision | Player and ball detection, ByteTrack | not checked / 0.84M (both over 1M in total) |
+
+The Roblox game ships no third-party code: it uses only Roblox's built-in services. Rojo (place
+build), the Luau CLI and Lune (headless tests) are build and test tools that never ship with the game.
 
 ## Credits
 

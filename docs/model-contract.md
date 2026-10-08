@@ -4,8 +4,8 @@ Input: `features`, float32 `[N, 21]`, one row per candidate shot. Output: `proba
 `[N, 2]`; column 1 is the probability that the hitting team wins the rally.
 
 All positions are from the hitter's point of view, in feet. Defined in `game/src/engine/features.ts` and
-`ml/dink_ml/features.py`; `ml/tests/test_features.py` checks the two against a fixture produced by the
-game code. Changing a feature means bumping `FEATURE_VERSION` in both and retraining; the game ignores a
+`ml/dink_ml/features.py`, with a Luau copy in `roblox/src/shared/Features.luau`; `ml/tests/test_features.py`
+and `roblox/tests/run.luau` check them against a fixture produced by the game code. Changing a feature means bumping `FEATURE_VERSION` in both and retraining; the game ignores a
 model whose card names a different version.
 
 | # | Name | Meaning |
@@ -34,3 +34,7 @@ model whose card names a different version.
 
 Training label: `won` (1 if the hitting team won the rally). Rows also carry `rally_id` so validation
 splits keep whole rallies together.
+
+The Roblox game can't run ONNX, so `ml/dink_ml/export_luau.py` also writes the trained trees as Luau
+tables (`roblox/src/shared/ShotModel.luau`), with `M.predict(x)` returning the column-1 probability.
+The export is checked against LightGBM in Python and again in the Luau tests.

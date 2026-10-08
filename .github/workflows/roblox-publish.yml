@@ -1,0 +1,49 @@
+name: Publish to Roblox
+
+# Builds the place file and publishes it to your Roblox experience with the Open Cloud API.
+# One-time setup:
+#   1. Publish the place once from Roblox Studio (File > Publish to Roblox) to create the experience.
+#   2. At https://create.roblox.com/dashboard/credentials create an API key with the
+#      "universe-places" API system, Write access, limited to that experience.
+#   3. In this repository: Settings > Secrets and variables > Actions, add the secret
+#      ROBLOX_API_KEY, and the variables ROBLOX_UNIVERSE_ID and ROBLOX_PLACE_ID
+#      (both IDs are shown on the experience's page in the Creator Dashboard).
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: Saved (Studio only) or Published (live for players)
+        type: choice
+        options: [Saved, Published]
+        default: Saved
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      ROJO_VERSION: "7.6.1"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rojo
+        run: |
+          curl -fsSLo rojo.zip "https://github.com/rojo-rbx/rojo/releases/download/v${ROJO_VERSION}/rojo-${ROJO_VERSION}-linux-x86_64.zip"
+          unzip -oq rojo.zip && chmod +x rojo
+      - name: Build
+        run: ./rojo build roblox/default.project.json -o dink-engine.rbxl
+      - name: Publish
+        env:
+          API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          UNIVERSE_ID: ${{ vars.ROBLOX_UNIVERSE_ID }}
+          PLACE_ID: ${{ vars.ROBLOX_PLACE_ID }}
+        run: |
+          if [ -z "$API_KEY" ] || [ -z "$UNIVERSE_ID" ] || [ -z "$PLACE_ID" ]; then
+            echo "::error::Set the ROBLOX_API_KEY secret and the ROBLOX_UNIVERSE_ID and ROBLOX_PLACE_ID variables first."
+            exit 1
+          fi
+          curl -fsS -X POST \
+            "https://apis.roblox.com/universes/v1/${UNIVERSE_ID}/places/${PLACE_ID}/versions?versionType=${{ inputs.version_type }}" \
+            -H "x-api-key: ${API_KEY}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @dink-engine.rbxl | tee response.json
+          echo "### Published place version $(python3 -c 'import json; print(json.load(open("response.json"))["versionNumber"])') (${{ inputs.version_type }})" >> "$GITHUB_STEP_SUMMARY"

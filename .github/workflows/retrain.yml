@@ -1,7 +1,7 @@
 name: Retrain model
 
 # Regenerates self-play data, retrains the shot-value model and opens a pull request with the new
-# ONNX file and model card. Add real shot tables under ml/data/real/ (via Git LFS or a release
+# ONNX file and model card for the web game and the Luau export for the Roblox game. Add real shot tables under ml/data/real/ (via Git LFS or a release
 # download step) and they are mixed in automatically.
 
 on:
@@ -40,7 +40,8 @@ jobs:
         run: |
           pip install -e .
           shopt -s nullglob
-          python -m dink_ml.train data/selfplay.csv data/real/*.csv --out ../game/public/models --source "self-play ${{ inputs.rallies }} rallies + real shots"
+          python -m dink_ml.train data/selfplay.csv data/real/*.csv --out ../game/public/models --source "self-play ${{ inputs.rallies }} rallies + real shots" \
+            --luau ../roblox/src/shared/ShotModel.luau --luau-fixture ../roblox/tests/fixtures/ModelFixture.luau
           python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json
           c = json.load(open("../game/public/models/model_card.json"))
@@ -50,6 +51,10 @@ jobs:
         with:
           branch: model/retrain-${{ github.run_number }}
           title: "Retrained shot-value model (run ${{ github.run_number }})"
-          body: "Automated retrain. See the job summary for metrics; the model card is in game/public/models/model_card.json."
-          add-paths: game/public/models/*
+          body: "Automated retrain for the web game (ONNX) and the Roblox game (Luau). See the job summary for metrics; the model card is in game/public/models/model_card.json."
+          add-paths: |
+            game/public/models/*
+            ml/models/*
+            roblox/src/shared/ShotModel.luau
+            roblox/tests/fixtures/ModelFixture.luau
           commit-message: "Retrain shot-value model"

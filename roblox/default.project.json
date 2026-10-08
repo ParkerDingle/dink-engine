@@ -1,0 +1,61 @@
+{
+  "name": "dink-engine",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Dink": {
+        "$path": "src/shared"
+      },
+      "DinkRemotes": {
+        "$className": "Folder",
+        "Ball": { "$className": "RemoteEvent" },
+        "Pose": { "$className": "UnreliableRemoteEvent" },
+        "Swing": { "$className": "RemoteEvent" },
+        "Decision": { "$className": "RemoteEvent" },
+        "DecisionEnd": { "$className": "RemoteEvent" },
+        "Plan": { "$className": "RemoteEvent" },
+        "Grade": { "$className": "RemoteEvent" },
+        "Point": { "$className": "RemoteEvent" },
+        "ServeTurn": { "$className": "RemoteEvent" },
+        "Info": { "$className": "RemoteEvent" },
+        "Commit": { "$className": "RemoteEvent" },
+        "Leave": { "$className": "RemoteEvent" },
+        "Serve": { "$className": "RemoteEvent" },
+        "Command": { "$className": "RemoteEvent" }
+      }
+    },
+    "ServerScriptService": {
+      "DinkServer": {
+        "$path": "src/server"
+      }
+    },
+    "StarterPlayer": {
+      "$properties": {
+        "CharacterUseJumpPower": false,
+        "CharacterJumpHeight": 0,
+        "CharacterWalkSpeed": 15,
+        "CameraMaxZoomDistance": 80
+      },
+      "StarterPlayerScripts": {
+        "DinkClient": {
+          "$path": "src/client"
+        }
+      }
+    },
+    "Lighting": {
+      "$properties": {
+        "Technology": "Future",
+        "ClockTime": 15.2,
+        "Brightness": 3,
+        "GlobalShadows": true,
+        "EnvironmentDiffuseScale": 1,
+        "EnvironmentSpecularScale": 1
+      }
+    },
+    "Workspace": {
+      "$properties": {
+        "Gravity": 196.2
+      }
+    }
+  }
+}

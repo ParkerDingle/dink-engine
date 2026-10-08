@@ -38,3 +38,11 @@ flowchart TB
 | `shots.py` | tracks + events + rally outcomes → shot table in the feature format |
 | `train.py` | shot tables → LightGBM → `shot_value.onnx` + `model_card.json` |
 | `features.py` | the contract, mirrored from the game and checked by a parity test |
+
+## Roblox game (`roblox/`)
+
+`roblox/src/shared` is a port of `game/src/sim` and `game/src/engine` to Luau, with no Roblox API calls,
+so `roblox/tests/run.luau` runs it headlessly. The server (`roblox/src/server`) owns one match: human
+players move their own characters, and their positions feed the simulation each frame; AI fills the
+other slots. Clients replay the ball from each hit's launch state, render AI players from a pose
+stream, and send shot calls back as remote events. See [roblox/README.md](../roblox/README.md).

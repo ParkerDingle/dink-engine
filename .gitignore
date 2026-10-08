@@ -14,3 +14,6 @@ ml/.pytest_cache/
 *.mov
 # misc
 .DS_Store
+# roblox
+roblox/build/
+roblox/sourcemap.json

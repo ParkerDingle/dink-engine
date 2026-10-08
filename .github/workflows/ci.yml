@@ -36,3 +36,31 @@ jobs:
           cache-dependency-path: ml/pyproject.toml
       - run: pip install -e ".[dev]"
       - run: pytest -q
+
+  roblox:
+    runs-on: ubuntu-latest
+    env:
+      LUAU_VERSION: "0.741"
+      ROJO_VERSION: "7.6.1"
+      LUNE_VERSION: "0.10.5"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Luau, Rojo and Lune
+        run: |
+          mkdir -p "$HOME/bin" && cd "$HOME/bin"
+          curl -fsSLo luau.zip "https://github.com/luau-lang/luau/releases/download/${LUAU_VERSION}/luau-ubuntu.zip"
+          curl -fsSLo rojo.zip "https://github.com/rojo-rbx/rojo/releases/download/v${ROJO_VERSION}/rojo-${ROJO_VERSION}-linux-x86_64.zip"
+          curl -fsSLo lune.zip "https://github.com/lune-org/lune/releases/download/v${LUNE_VERSION}/lune-${LUNE_VERSION}-linux-x86_64.zip"
+          for z in *.zip; do unzip -oq "$z"; done
+          chmod +x luau rojo lune
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+      - name: Engine, model and match tests
+        run: luau roblox/tests/run.luau
+      - name: Build the place file
+        run: rojo build roblox/default.project.json -o roblox/build/dink-engine.rbxl
+      - name: Play the built place headlessly
+        run: lune run roblox/tests/lune/smoke.luau roblox/build/dink-engine.rbxl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dink-engine-roblox
+          path: roblox/build/dink-engine.rbxl

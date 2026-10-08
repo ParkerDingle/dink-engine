@@ -81,7 +81,8 @@ def check_onnx(path: Path, booster: lgb.Booster, X: np.ndarray) -> float:
     return float(np.max(np.abs(out - booster.predict(X))))
 
 
-def train(paths: list[str], out_dir: str, rounds: int = 600, seed: int = 0, source: str | None = None) -> dict:
+def train(paths: list[str], out_dir: str, rounds: int = 600, seed: int = 0, source: str | None = None,
+          luau_out: str | None = None, luau_fixture: str | None = None, lgb_out: str | None = None) -> dict:
     df = load(paths)
     tr, va = split_by_rally(df, 0.15, seed)
     Xtr, ytr = tr[FEATURE_NAMES].to_numpy(np.float32), tr["won"].to_numpy()
@@ -111,6 +112,12 @@ def train(paths: list[str], out_dir: str, rounds: int = 600, seed: int = 0, sour
         "top_features": [n for _, n in sorted(zip(gain, FEATURE_NAMES), reverse=True)[:8]],
         "created": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
     }
+    if lgb_out:
+        Path(lgb_out).parent.mkdir(parents=True, exist_ok=True)
+        booster.save_model(lgb_out)
+    if luau_out:
+        from .export_luau import export
+        card["luau_max_abs_diff"] = export(booster, luau_out, card, Xva[:40].astype(np.float64), luau_fixture)
     (out / "model_card.json").write_text(json.dumps(card, indent=2))
     return card
 
@@ -122,8 +129,11 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--rounds", type=int, default=600)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--source", default=None, help="short description stored in the model card")
+    ap.add_argument("--luau", default=None, help="also export the model as a Luau module for the Roblox game")
+    ap.add_argument("--luau-fixture", default=None, help="write a Luau test fixture of inputs and expected outputs")
+    ap.add_argument("--lgb", default="models/shot_value.lgb.txt", help="where to keep the LightGBM text model")
     a = ap.parse_args(argv)
-    card = train(a.csv, a.out, a.rounds, a.seed, a.source)
+    card = train(a.csv, a.out, a.rounds, a.seed, a.source, a.luau, a.luau_fixture, a.lgb)
     print(json.dumps({k: card[k] for k in ["rows", "rallies", "trees", "auc", "log_loss", "baseline_log_loss", "onnx_max_abs_diff", "top_features"]}, indent=2))
 
 
