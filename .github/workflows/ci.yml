@@ -57,7 +57,7 @@ jobs:
       - name: Engine, model and match tests
         run: luau roblox/tests/run.luau
       - name: Build the place file
-        run: rojo build roblox/default.project.json -o roblox/build/dink-engine.rbxl
+        run: mkdir -p roblox/build && rojo build roblox/default.project.json -o roblox/build/dink-engine.rbxl
       - name: Play the built place headlessly
         run: lune run roblox/tests/lune/smoke.luau roblox/build/dink-engine.rbxl
       - uses: actions/upload-artifact@v4

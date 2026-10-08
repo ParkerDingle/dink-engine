@@ -66,7 +66,7 @@ Tools: [Rojo](https://rojo.space) 7.6 (builds the place), the [Luau](https://lua
 
 ```bash
 luau roblox/tests/run.luau                                        # 15 engine, model and match tests
-rojo build roblox/default.project.json -o roblox/build/dink-engine.rbxl
+mkdir -p roblox/build && rojo build roblox/default.project.json -o roblox/build/dink-engine.rbxl
 lune run roblox/tests/lune/smoke.luau roblox/build/dink-engine.rbxl
 ```
 

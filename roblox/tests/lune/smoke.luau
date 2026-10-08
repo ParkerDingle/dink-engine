@@ -1,7 +1,7 @@
 --!nocheck
 -- End-to-end smoke test of the built place file, run with Lune (https://lune-org.github.io/docs):
 --
---     rojo build roblox/default.project.json -o roblox/build/dink-engine.rbxl
+--     mkdir -p roblox/build && rojo build roblox/default.project.json -o roblox/build/dink-engine.rbxl
 --     lune run roblox/tests/lune/smoke.luau roblox/build/dink-engine.rbxl
 --
 -- Lune loads the real .rbxl and gives us real Roblox instances and datatypes, so every property the
