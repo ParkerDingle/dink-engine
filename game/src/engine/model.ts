@@ -4,6 +4,7 @@
 import type { Scorer } from '../sim/match';
 import type { EngineState, ShotOption } from './rules';
 import { featuresFor, FEATURE_VERSION, N_FEATURES } from './features';
+import { fetchBinary } from '../fetchBinary';
 
 export interface ModelCard {
   file: string; feature_version: string; trained_on: string; rows: number; auc: number; log_loss: number;
@@ -18,7 +19,8 @@ export async function loadModel(baseUrl: string): Promise<{ scorer: Scorer; card
     if (card.feature_version !== FEATURE_VERSION) { console.warn(`Model expects ${card.feature_version}, game sends ${FEATURE_VERSION}`); return null; }
     const ort = await import('onnxruntime-web/wasm');
     ort.env.wasm.numThreads = 1;
-    const session = await ort.InferenceSession.create(new URL('models/' + card.file, baseUrl).href, { executionProviders: ['wasm'] });
+    const bytes = new Uint8Array(await fetchBinary(new URL('models/' + card.file, baseUrl).href));
+    const session = await ort.InferenceSession.create(bytes, { executionProviders: ['wasm'] });
     const input = session.inputNames[0];
     const output = session.outputNames.includes('probabilities') ? 'probabilities' : session.outputNames[session.outputNames.length - 1];
     let queue: Promise<unknown> = Promise.resolve();

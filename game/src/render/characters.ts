@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { fetchBinary } from '../fetchBinary';
 
 type V = [number, number, number];
 // Upper-arm and forearm directions in the character's own frame (facing +z, its right hand on -x).
@@ -134,6 +135,6 @@ export class Character {
 }
 
 export async function loadCharacters(url: string, scene: THREE.Scene): Promise<Character[]> {
-  const gltf = await new GLTFLoader().loadAsync(url);
+  const gltf = await new GLTFLoader().parseAsync(await fetchBinary(url), '');
   return [0, 1, 2, 3].map(i => new Character(gltf.scene, gltf.animations, i, scene));
 }
